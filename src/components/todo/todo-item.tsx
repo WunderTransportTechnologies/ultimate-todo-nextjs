@@ -21,7 +21,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, CheckCircle, Clock, MoreVertical, Trash, Edit } from "lucide-react";
+import { 
+  CalendarIcon, 
+  CheckCircleIcon, 
+  ClockIcon, 
+  MoreVerticalIcon, 
+  TrashIcon, 
+  EditIcon 
+} from "@/components/icons";
 
 interface TodoItemProps {
   todo: Todo;
@@ -93,7 +100,7 @@ export function TodoItem({ todo, onStatusChange, onDelete }: TodoItemProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <MoreVertical className="h-4 w-4" />
+                <MoreVerticalIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -123,7 +130,7 @@ export function TodoItem({ todo, onStatusChange, onDelete }: TodoItemProps) {
           {priorityBadge()}
           {todo.dueDate && (
             <div className="flex items-center text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3 mr-1" />
+              <CalendarIcon className="h-3 w-3 mr-1" />
               {formatDate(todo.dueDate)}
             </div>
           )}
@@ -131,7 +138,7 @@ export function TodoItem({ todo, onStatusChange, onDelete }: TodoItemProps) {
       </CardContent>
       <CardFooter className="pt-0 flex justify-between">
         <div className="flex items-center text-xs text-muted-foreground">
-          <Clock className="h-3 w-3 mr-1" />
+          <ClockIcon className="h-3 w-3 mr-1" />
           更新: {formatDate(todo.updatedAt)}
         </div>
         <div className="flex gap-2">
@@ -142,7 +149,7 @@ export function TodoItem({ todo, onStatusChange, onDelete }: TodoItemProps) {
             onClick={() => handleStatusChange("completed")}
             disabled={todo.status === "completed" || isUpdating}
           >
-            <CheckCircle className="h-4 w-4 mr-1" />
+            <CheckCircleIcon className="h-4 w-4 mr-1" />
             完了
           </Button>
         </div>
