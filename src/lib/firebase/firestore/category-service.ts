@@ -14,16 +14,7 @@ import {
 import { db } from '../config';
 import { Category } from '@/types/todo';
 
-// カテゴリをデータベース用のオブジェクトに変換する
-const categoryToDbObject = (category: Omit<Category, 'id'>) => {
-  return {
-    ...category,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  };
-};
-
-// DBから取得したデータをカテゴリオブジェクトに変換する
+// DBから取得したデータをCategoryオブジェクトに変換する
 const dbObjectToCategory = (id: string, data: any): Category => {
   return {
     id,
@@ -33,31 +24,9 @@ const dbObjectToCategory = (id: string, data: any): Category => {
   };
 };
 
-// カテゴリコレクションの参照を取得
-const categoriesRef = collection(db, 'categories');
-
-// 新しいカテゴリを作成
-export const createCategory = async (category: Omit<Category, 'id'>) => {
-  const dbObject = categoryToDbObject(category);
-  const docRef = await addDoc(categoriesRef, dbObject);
-  return docRef.id;
-};
-
-// カテゴリを更新
-export const updateCategory = async (id: string, category: Partial<Omit<Category, 'id'>>) => {
-  const docRef = doc(db, 'categories', id);
-  const updateData = { ...category, updatedAt: serverTimestamp() };
-  await updateDoc(docRef, updateData);
-};
-
-// カテゴリを削除
-export const deleteCategory = async (id: string) => {
-  const docRef = doc(db, 'categories', id);
-  await deleteDoc(docRef);
-};
-
-// ユーザーのすべてのカテゴリを取得
+// ユーザーのカテゴリ一覧を取得
 export const getUserCategories = async (userId: string): Promise<Category[]> => {
+  const categoriesRef = collection(db, 'categories');
   const q = query(
     categoriesRef,
     where('userId', '==', userId),
@@ -65,43 +34,74 @@ export const getUserCategories = async (userId: string): Promise<Category[]> => 
   );
 
   const querySnapshot = await getDocs(q);
-  const categories: Category[] = [];
+  return querySnapshot.docs.map((doc) => dbObjectToCategory(doc.id, doc.data()));
+};
 
-  querySnapshot.forEach((doc) => {
-    categories.push(dbObjectToCategory(doc.id, doc.data()));
+// カテゴリを作成
+export const createCategory = async (
+  category: Omit<Category, 'id'>
+): Promise<Category> => {
+  const categoriesRef = collection(db, 'categories');
+  const docRef = await addDoc(categoriesRef, {
+    ...category,
+    createdAt: serverTimestamp(),
   });
-
-  return categories;
+  
+  const newCategory = await getDoc(docRef);
+  return dbObjectToCategory(docRef.id, newCategory.data());
 };
 
-// IDによって特定のカテゴリを取得
-export const getCategoryById = async (id: string): Promise<Category | null> => {
-  const docRef = doc(db, 'categories', id);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    return dbObjectToCategory(docSnap.id, docSnap.data());
-  }
-
-  return null;
+// カテゴリを更新
+export const updateCategory = async (
+  id: string,
+  category: Partial<Omit<Category, 'id' | 'userId'>>
+): Promise<void> => {
+  const categoryRef = doc(db, 'categories', id);
+  await updateDoc(categoryRef, {
+    ...category,
+    updatedAt: serverTimestamp(),
+  });
 };
 
-// デフォルトカテゴリを初期化
-export const initializeDefaultCategories = async (userId: string): Promise<void> => {
+// カテゴリを削除
+export const deleteCategory = async (id: string): Promise<void> => {
+  const categoryRef = doc(db, 'categories', id);
+  await deleteDoc(categoryRef);
+};
+
+// デフォルトカテゴリを作成（ユーザー登録時に使用）
+export const createDefaultCategories = async (userId: string): Promise<void> => {
   const defaultCategories = [
-    { name: '仕事', color: '#4338ca', userId },
-    { name: 'プライベート', color: '#16a34a', userId },
-    { name: '勉強', color: '#ea580c', userId },
-    { name: '買い物', color: '#db2777', userId },
+    {
+      name: '仕事',
+      color: '#4f46e5', // インディゴ
+      userId,
+    },
+    {
+      name: '個人',
+      color: '#10b981', // エメラルド
+      userId,
+    },
+    {
+      name: '買い物',
+      color: '#f59e0b', // アンバー
+      userId,
+    },
+    {
+      name: '健康',
+      color: '#ef4444', // レッド
+      userId,
+    },
   ];
 
-  const q = query(categoriesRef, where('userId', '==', userId));
-  const querySnapshot = await getDocs(q);
+  // 一括で作成
+  const categoriesRef = collection(db, 'categories');
+  const promises = defaultCategories.map((category) => 
+    addDoc(categoriesRef, {
+      ...category,
+      createdAt: serverTimestamp(),
+    })
+  );
 
-  // ユーザーのカテゴリが存在しない場合のみ初期化
-  if (querySnapshot.empty) {
-    for (const category of defaultCategories) {
-      await createCategory(category);
-    }
-  }
+  await Promise.all(promises);
 };
