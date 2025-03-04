@@ -7,7 +7,7 @@ import { getUserTodos, updateTodoStatus, deleteTodo } from "@/lib/firebase/fires
 import { TodoItem } from "./todo-item";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle } from "lucide-react";
+import { PlusCircleIcon } from "@/components/icons";
 import { toast } from "sonner";
 import { TodoForm } from "./todo-form";
 
@@ -83,7 +83,7 @@ export function TodoList() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">タスク一覧</h1>
         <Button onClick={() => setShowCreateForm(!showCreateForm)}>
-          <PlusCircle className="w-4 h-4 mr-2" />
+          <PlusCircleIcon className="w-4 h-4 mr-2" />
           新規タスク
         </Button>
       </div>
