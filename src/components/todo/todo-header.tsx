@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { LogOut, Moon, Sun, User } from "lucide-react";
+import { LogOutIcon, MoonIcon, SunIcon, UserIcon } from "@/components/icons";
 import { toast } from "sonner";
 
 export function TodoHeader() {
@@ -39,20 +39,20 @@ export function TodoHeader() {
             aria-label="テーマ切り替え"
           >
             {theme === "dark" ? (
-              <Sun className="h-5 w-5" />
+              <SunIcon className="h-5 w-5" />
             ) : (
-              <Moon className="h-5 w-5" />
+              <MoonIcon className="h-5 w-5" />
             )}
           </Button>
           <div className="flex items-center gap-2">
             {user && (
               <>
                 <span className="text-sm hidden md:inline-block">
-                  <User className="inline-block w-4 h-4 mr-1" />
+                  <UserIcon className="inline-block w-4 h-4 mr-1" />
                   {user.email}
                 </span>
                 <Button variant="outline" size="sm" onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOutIcon className="h-4 w-4 mr-2" />
                   ログアウト
                 </Button>
               </>
