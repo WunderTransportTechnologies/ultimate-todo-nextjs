@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ユーザー認証関連のルール
+    match /users/{userId} {
+      // 自分のデータのみ読み書き可能
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false; // ユーザー削除は禁止
+    }
+    
+    // Todoタスク関連のルール
+    match /todos/{todoId} {
+      // 自分のタスクデータのみ読み書き可能
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    // カテゴリ関連のルール
+    match /categories/{categoryId} {
+      // 自分のカテゴリデータのみ読み書き可能
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}
